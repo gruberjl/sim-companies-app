@@ -25,4 +25,4 @@ const getResources = () => {
   })
 }
 
-getResources()
+export {getResources}

@@ -3,7 +3,9 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
+		"prebuild": "node pre-build",
 		"build": "vite build",
+		"postbuild": "node post-build",
 		"preview": "vite preview"
 	},
 	"dependencies": {
