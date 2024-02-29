@@ -1,0 +1,51 @@
+main, .main {
+  max-width: 800px;
+  margin: auto;
+}
+
+main {
+  margin:12px;
+}
+
+.header-container {
+  background: #fe7e0f;
+  margin-bottom: 12px;
+}
+
+.flex {
+  display: flex;
+}
+
+.margin6 {
+  margin: 6px;
+}
+
+.center {
+	display: flex;
+  justify-content: center;
+}
+
+.term-container {
+  border: 1px solid #666;
+  border-radius: 8px;
+  margin: 6px
+}
+
+.product-term {
+  display: flex;
+  flex-flow: column;
+}
+
+@media (min-width: 768px) {
+  .product-term {
+    flex-flow: row;
+  }
+}
+
+.margin6-0 {
+  margin: 6px 0px;
+}
+
+.margin0-6 {
+  margin: 0px 6px;
+}
