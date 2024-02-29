@@ -20,5 +20,6 @@
 	},
 	"eslintConfig": {
 		"extends": "preact"
-	}
+	},
+	"version": "0.0.1"
 }
