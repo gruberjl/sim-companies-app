@@ -1,0 +1,98 @@
+body {
+  margin: 0px;
+  font-size: 18px;
+}
+
+header {
+  display: flex;
+  height: 40px;
+  background-color: black;
+}
+
+main {
+  max-width: 750px;
+  margin:auto
+}
+
+header a {
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+}
+
+h1 {
+  margin: 6px;
+}
+
+.term {
+  border-bottom: 1px solid rgba(0,0,0,.3);
+  margin: 6px;
+  padding: 6px 0px;
+}
+
+fieldset {
+  display: flex;
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  height: 46px;
+}
+
+input, .contract input {
+  height: 34px;
+  font-size: 20px;
+}
+
+fieldset > input {
+  width: 25%;
+}
+
+fieldset > span {
+  display: inline-block;
+}
+
+fieldset > * {
+  margin: 0px 3px;
+}
+
+.button-delete {
+  background: rgb(202, 60, 60);
+  color: white;
+  border-radius: 8px;
+  height: 40px;
+}
+
+
+.contract {
+  border-bottom: 1px solid rgba(0,0,0,.3);
+  margin: 6px;
+  padding: 6px 0px;
+}
+
+.contract * {
+  height: 40px;
+}
+
+.contract-title {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0px;
+}
+
+.img-container {
+  width:40px;
+}
+
+.button-delete {
+  width: 40px;
+  background: red;
+}
+
+.contract select {
+  flex-grow:1
+}
+
+.contract-body > * {
+  width: 33%;
+  margin: 0px 3px;
+}
