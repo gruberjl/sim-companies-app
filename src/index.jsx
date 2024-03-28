@@ -35,15 +35,15 @@ function Term({term, setTerm}) {
 				<input value={term.wages} onInput={setWages} placeholder="Wages" type="number"/>
 				<input value={term.qualityBonus} onInput={setQualityBonus} placeholder="Bonus %" type="number"/>
 				<button className="button-delete pure-button" onClick={deleteTerm}>X</button>
-				<span>-$35,000</span>
+				<span className="term-profit">{term.profit || ''}</span>
 			</fieldset>
 			<fieldset>
 				<img src="sor.png" height="40" width="40" alt="Sub-orbital rocket"/>
 				<input value={term.sor.price} onInput={setThePrice('sor')} placeholder="$" type="number"/>
 				<input value={term.sor.quantity} onInput={setQuantity('sor')} placeholder="Quantity" type="number"/>
 				<span>
-					<div>$2,500</div>
-					<div>Q5 $37,500</div>
+					<div>{term.sor.highestProfit ? term.sor.highestProfit : ''}</div>
+					<div>{term.sor.profitProduct || ''}</div>
 				</span>
 			</fieldset>
 			<fieldset>
@@ -51,8 +51,8 @@ function Term({term, setTerm}) {
 				<input value={term.bfr.price} onInput={setThePrice('bfr')} placeholder="$" type="number"/>
 				<input value={term.bfr.quantity} onInput={setQuantity('bfr')} placeholder="Quantity" type="number"/>
 				<span>
-					<div></div>
-					<div></div>
+					<div>{term.bfr.highestProfit ? term.bfr.highestProfit : ''}</div>
+					<div>{term.bfr.profitProduct || ''}</div>
 				</span>
 			</fieldset>
 			<fieldset>
@@ -60,8 +60,8 @@ function Term({term, setTerm}) {
 				<input value={term.jumbo.price} onInput={setThePrice('jumbo')} placeholder="$" type="number"/>
 				<input value={term.jumbo.quantity} onInput={setQuantity('jumbo')} placeholder="Quantity" type="number"/>
 				<span>
-					<div></div>
-					<div></div>
+					<div>{term.jumbo.highestProfit ? term.jumbo.highestProfit : ''}</div>
+					<div>{term.jumbo.profitProduct || ''}</div>
 				</span>
 			</fieldset>
 			<fieldset>
@@ -69,8 +69,8 @@ function Term({term, setTerm}) {
 				<input value={term.lux.price} onInput={setThePrice('lux')} placeholder="$" type="number"/>
 				<input value={term.lux.quantity} onInput={setQuantity('lux')} placeholder="Quantity" type="number"/>
 				<span>
-					<div></div>
-					<div></div>
+					<div>{term.lux.highestProfit ? term.lux.highestProfit : ''}</div>
+					<div>{term.lux.profitProduct || ''}</div>
 				</span>
 			</fieldset>
 			<fieldset>
@@ -78,8 +78,8 @@ function Term({term, setTerm}) {
 				<input value={term.sep.price} onInput={setThePrice('sep')} placeholder="$" type="number"/>
 				<input value={term.sep.quantity} onInput={setQuantity('sep')} placeholder="Quantity" type="number"/>
 				<span>
-					<div></div>
-					<div></div>
+					<div>{term.sep.highestProfit ? term.sep.highestProfit : ''}</div>
+					<div>{term.sep.profitProduct || ''}</div>
 				</span>
 			</fieldset>
 			<fieldset>
@@ -87,7 +87,7 @@ function Term({term, setTerm}) {
 				<input value={term.sat.price} onInput={setThePrice('sat')} placeholder="$" type="number"/>
 				<input value={term.sat.quantity} onInput={setQuantity('sat')} placeholder="Quantity" type="number"/>
 				<span>
-					<div></div>
+					<div>{term.sat.highestProfit ? term.sat.highestProfit : ''}</div>
 					<div></div>
 				</span>
 			</fieldset>
@@ -156,6 +156,7 @@ export function App() {
 		if (term == null) {
 			newTerms.splice(idx, 1)
 		} else {
+			calculateProfitForTerm(term, contracts)
 			newTerms[idx] = term
 		}
 		
@@ -163,8 +164,55 @@ export function App() {
 			calculateProfitForContract(contract, newTerms)
 			return contract
 		})
+		
 		setContracts(newContracts)
 		setTerms(newTerms)
+	}
+
+	const calculateProfitForTerm = (term, contracts) => {
+		term.profit = undefined
+		term.sep.highestProfit = undefined
+		term.sat.highestProfit = undefined
+		term.lux.highestProfit = undefined
+		term.jumbo.highestProfit = undefined
+		term.bfr.highestProfit = undefined
+		term.sor.highestProfit = undefined
+
+		if (!term.qualityBonus)
+			return
+
+		contracts.forEach(contract => {
+			if (term[contract.product].price && contract.quality) {
+				const price = Number(term[contract.product].price)
+				const qualityBonus = (term.qualityBonus/100)*price*contract.quality
+				const contractPrice = contract.price
+				const profit = price+qualityBonus-contractPrice
+				if (term[contract.product].highestProfit === undefined || profit > term[contract.product].highestProfit)
+					term[contract.product].highestProfit = profit
+					term[contract.product].profitProduct = `Q${contract.quality}: ${contractPrice}`
+				}
+		})
+		
+		if (!term.wages)
+			return
+		if (term.sep.price && !term.sep.highestProfit)
+			return
+
+		let profit = -term.wages
+		if (term.sep.highestProfit)
+			profit = profit + term.sep.highestProfit
+		if (term.sat.highestProfit)
+			profit = profit + term.sat.highestProfit
+		if (term.lux.highestProfit)
+			profit = profit + term.lux.highestProfit
+		if (term.jumbo.highestProfit)
+			profit = profit + term.jumbo.highestProfit
+		if (term.bfr.highestProfit)
+			profit = profit + term.bfr.highestProfit
+		if (term.sor.highestProfit)
+			profit = profit + term.sor.highestProfit
+
+		term.profit = profit
 	}
 
 	const calculateProfitForContract = (contract, newTerms) => {
@@ -185,15 +233,22 @@ export function App() {
 
 	const setContract = idx => (contract) => {
 		const newContracts = [...contracts]
+
 		if (contract == null) {
 			newContracts.splice(idx, 1)
 			setContracts(newContracts)
 		} else {
 			calculateProfitForContract(contract, terms)
 			newContracts[idx] = contract
-			setContracts(newContracts)
 		}
 
+		const newTerms = terms.map(term => {
+			calculateProfitForTerm(term, newContracts)
+			return term
+		})
+		setTerms(newTerms)
+
+		setContracts(newContracts)
 	}
 
 	const addTerm = () => {
@@ -201,12 +256,13 @@ export function App() {
 		newTerms.push({
 			qualityBonus: undefined,
 			wages: undefined,
-			sep: {price: '', quantity: ''},
-			sat: {price: '', quantity: ''},
-			lux: {price: '', quantity: ''},
-			jumbo: {price: '', quantity: ''},
-			bfr: {price: '', quantity: ''},
-			sor: {price: '', quantity: ''},
+			profit: undefined,
+			sep: {price: '', quantity: '', highestProfit: undefined, profitProduct: ''},
+			sat: {price: '', quantity: '', highestProfit: undefined, profitProduct: ''},
+			lux: {price: '', quantity: '', highestProfit: undefined, profitProduct: ''},
+			jumbo: {price: '', quantity: '', highestProfit: undefined, profitProduct: ''},
+			bfr: {price: '', quantity: '', highestProfit: undefined, profitProduct: ''},
+			sor: {price: '', quantity: '', highestProfit: undefined, profitProduct: ''},
 		})
 
 		setTerms(newTerms)
@@ -224,6 +280,33 @@ export function App() {
 		setContracts(newContracts)
 	}
 
+	let message = ``
+	let sep = 0
+	let lux = 0
+	let jumbo = 0
+	let sor = 0
+	let sat = 0
+	let bfr = 0
+	terms.forEach(term => {
+		sep += Number(term.sep.quantity)
+		lux += Number(term.lux.quantity)
+		jumbo += Number(term.jumbo.quantity)
+		sor += Number(term.sor.quantity)
+		sat += Number(term.sat.quantity)
+		bfr += Number(term.bfr.quantity)
+	})
+	if (sor > 0) message = message + `${sor} :re-91: Sub-Orbital Rockets\n`
+	if (bfr > 0) message = message + `${bfr} :re-94: BFRs\n`
+	if (jumbo > 0) message = message + `${jumbo} :re-95: Jumbo Jets\n`
+	if (lux > 0) message = message + `${lux} :re-96: Luxury Jets\n`
+	if (sep > 0) message = message + `${sep} :re-97: Single Engine Planes\n`
+	if (sat > 0) message = message + `${sat}:re-99: Satellites\n`
+	if (message.length > 0) message = `✈️ :bd-B: BUYING :bd-B: ✈️\n` + message
+
+	const copyToClipboard = () => {
+		navigator.clipboard.writeText(message)
+	}
+
 	return (
 		<div>
 			<Header currentPage={'/'}/>
@@ -233,6 +316,16 @@ export function App() {
 					{ terms.map((term, idx) => (
 						<Term term={term} setTerm={setTerm(idx)} key={idx}/>
 					))}
+					{ message
+						? (
+							<div>
+								<textarea value={message} />
+								<button onClick={copyToClipboard} className="copy-to-clipboard">Copy to clipboard</button>
+							</div>
+						)
+						: ''
+					}
+
 					<button className="btn-green" onClick={addTerm}>Add Term</button>
 				</section>
 				<section>
