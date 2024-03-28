@@ -135,7 +135,7 @@ function Contract({contract, setContract}) {
 					<option value="bfr">BFR</option>
 					<option value="sor">Sub-orbital rocket</option>
 				</select>
-				<button className="button-delete pure-button" onClick={deleteContract}>X</button>
+				<button className="button-delete" onClick={deleteContract}>X</button>
 			</div>
 			<div className="contract-body">
 				<input class="price" value={contract.price} onInput={setPrice} placeholder="Price ($)" type="number"/>
@@ -233,13 +233,13 @@ export function App() {
 					{ terms.map((term, idx) => (
 						<Term term={term} setTerm={setTerm(idx)} key={idx}/>
 					))}
-					<button className="pure-button pure-button-primary" onClick={addTerm}>Add Term</button>
+					<button className="btn-green" onClick={addTerm}>Add Term</button>
 				</section>
 				<section>
 					{ contracts.map((contract, idx) => (
 						<Contract contract={contract} setContract={setContract(idx)} key={idx}/>
 					))}
-					<button className="pure-button pure-button-primary" onClick={addContract}>Add Contract</button>
+					<button className="btn-green" onClick={addContract}>Add Contract</button>
 				</section>
 			</main>
 		</div>
